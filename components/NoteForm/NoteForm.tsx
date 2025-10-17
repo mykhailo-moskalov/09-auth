@@ -1,12 +1,12 @@
 "use client";
 
 import css from "./NoteForm.module.css";
-import { createNote } from "@/lib/api/api";
+import { createNote } from "@/lib/api/clientApi";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { newNoteValues, NoteTag, type NoteFormValues } from "@/types/note";
+import { NoteTag, type NoteFormValues } from "@/types/note";
 import { useNoteDraftStore } from "@/lib/store/noteStore";
 
 export default function NoteForm() {
@@ -41,7 +41,7 @@ export default function NoteForm() {
   const handleSubmit = (formData: FormData) => {
     const rawValues = Object.fromEntries(formData.entries());
 
-    const values: newNoteValues = {
+    const values: NoteFormValues = {
       title: String(rawValues.title || ""),
       content: String(rawValues.content || ""),
       tag: rawValues.tag as NoteTag,
