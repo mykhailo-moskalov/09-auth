@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register, RegisterRequest } from "@/lib/api/clientApi";
+import { register, UserRequest } from "@/lib/api/clientApi";
 import { ApiError } from "@/app/api/api";
-import { useAuthStore } from "@/lib/stores/authStore";
+import { useAuthStore } from "@/lib/store/authStore";
 import css from "./SignUpPage.module.css";
 
 const SignUp = () => {
@@ -14,7 +14,7 @@ const SignUp = () => {
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      const formValues = Object.fromEntries(formData) as RegisterRequest;
+      const formValues = Object.fromEntries(formData) as UserRequest;
 
       const res = await register(formValues);
 
@@ -37,7 +37,7 @@ const SignUp = () => {
   return (
     <main className={css.mainContent}>
       <h1 className={css.formTitle}>Sign up</h1>
-      <form className={css.form}>
+      <form className={css.form} action={handleSubmit}>
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -66,9 +66,8 @@ const SignUp = () => {
           </button>
         </div>
 
-        <p className={css.error}>Error</p>
+        {error && <p className={css.error}>{error}</p>}
       </form>
-      {error ? "" : ""}
     </main>
   );
 };

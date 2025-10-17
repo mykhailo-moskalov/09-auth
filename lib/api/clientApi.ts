@@ -27,29 +27,20 @@ export const fetchNotes = async (
   page: number,
   tag?: string
 ): Promise<NotesHTTPResponse> => {
-  const resp = await nextServer.get<NotesHTTPResponse>("/notes", {
+  const { data } = await nextServer.get<NotesHTTPResponse>("/notes", {
     params: {
       search,
       page,
       perPage: 12,
       ...(tag ? { tag } : {}),
     },
-    // headers: {
-    //   Authorization: `Bearer ${NOTEHUB_TOKEN}`,
-    // },
   });
-
-  return resp.data;
+  return data;
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
-  const resp = await nextServer.get<Note>(`/notes/${id}`, {
-    // headers: {
-    //   Authorization: `Bearer ${NOTEHUB_TOKEN}`,
-    // },
-  });
-
-  return resp.data;
+  const { data } = await nextServer.get<Note>(`/notes/${id}`);
+  return data;
 };
 
 export const createNote = async ({
@@ -58,34 +49,23 @@ export const createNote = async ({
   tag,
 }: NoteFormValues): Promise<Note> => {
   const newNote: NoteFormValues = { title, content, tag };
-
-  const resp = await nextServer.post<Note>("/notes", newNote, {
-    // headers: {
-    //   Authorization: `Bearer ${NOTEHUB_TOKEN}`,
-    // },
-  });
-
-  return resp.data;
+  const { data } = await nextServer.post<Note>("/notes", newNote);
+  return data;
 };
 
 export async function deleteNote(id: string): Promise<Note> {
-  const resp = await nextServer.delete<Note>(`/notes/${id}`, {
-    // headers: {
-    //   Authorization: `Bearer ${NOTEHUB_TOKEN}`,
-    // },
-  });
-
-  return resp.data;
+  const { data } = await nextServer.delete<Note>(`/notes/${id}`);
+  return data;
 }
 
-export const register = async (data: UserRequest) => {
-  const res = await nextServer.post<User>("/auth/register", data);
-  return res.data;
+export const register = async (userData: UserRequest) => {
+  const { data } = await nextServer.post<User>("/auth/register", userData);
+  return data;
 };
 
-export const login = async (data: UserRequest) => {
-  const res = await nextServer.post<User>("/auth/login", data);
-  return res.data;
+export const login = async (userData: UserRequest) => {
+  const { data } = await nextServer.post<User>("/auth/login", userData);
+  return data;
 };
 
 export const logout = async (): Promise<void> => {
@@ -93,8 +73,8 @@ export const logout = async (): Promise<void> => {
 };
 
 export const checkSession = async () => {
-  const res = await nextServer.get<CheckSessionRequest>("/auth/session");
-  return res.data.success;
+  const { data } = await nextServer.get<CheckSessionRequest>("/auth/session");
+  return data.success;
 };
 
 export const getMe = async () => {
@@ -103,6 +83,6 @@ export const getMe = async () => {
 };
 
 export const updateMe = async (payload: UpdateUserRequest) => {
-  const res = await nextServer.patch<User>("/users/me", payload);
-  return res.data;
+  const { data } = await nextServer.patch<User>("/users/me", payload);
+  return data;
 };

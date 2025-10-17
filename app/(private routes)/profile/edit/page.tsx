@@ -1,54 +1,89 @@
 "use client";
 
-import AvatarPicker from "@/components/AvatarPicker/AvatarPicker";
-import { getMe, updateMe, uploadImage } from "@/lib/api/clientApi";
-import { Metadata } from "next";
+import { getMe, updateMe } from "@/lib/api/clientApi";
+import Image from "next/image";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-
-export const metadata: Metadata = {
-  title: "Edit Profile",
-  description: "Edit your user details and settings",
-};
+import css from "./EditProfilePage.module.css";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { ApiError } from "@/app/api/api";
+import { useAuthStore } from "@/lib/store/authStore";
 
 const EditProfile = () => {
-  const [userName, setUserName] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     getMe().then((user) => {
-      setUserName(user.userName ?? "");
-      setPhotoUrl(user.photoUrl ?? "");
+      setUsername(user.username ?? "");
     });
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setUserName(e.target.value);
+    setUsername(e.target.value);
   };
 
   const handleSaveUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!user) {
+      return;
+    }
+
     try {
-      const newPhotoUrl = imageFile ? await uploadImage(imageFile) : "";
-      await updateMe({ userName, photoUrl: newPhotoUrl });
+      await updateMe({ username });
+      router.push("/profile");
     } catch (error) {
-      console.error("Oops, some error:", error);
+      toast.error(
+        (error as ApiError).response?.data?.error ??
+          (error as ApiError).message ??
+          "Oops... some error"
+      );
+      router.push("/profile");
     }
   };
 
   return (
-    <div>
-      <h1>Edit Profile</h1>
-      <br />
-      <AvatarPicker profilePhotoUrl={photoUrl} onChangePhoto={setImageFile} />
-      <br />
-      <form onSubmit={handleSaveUser}>
-        <input type="text" value={userName} onChange={handleChange} />
-        <br />
-        <button type="submit">Save user</button>
-      </form>
-    </div>
+    <main className={css.mainContent}>
+      <div className={css.profileCard}>
+        <h1 className={css.formTitle}>Edit Profile</h1>
+
+        {user?.avatar && (
+          <Image
+            src={user.avatar}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className={css.avatar}
+          />
+        )}
+
+        <form className={css.profileInfo} onSubmit={handleSaveUser}>
+          <div className={css.usernameWrapper}>
+            <label htmlFor="username">Username: {username}</label>
+            <input
+              id="username"
+              type="text"
+              className={css.input}
+              value={username}
+              onChange={handleChange}
+            />
+          </div>
+
+          <p>Email: {user?.email}</p>
+
+          <div className={css.actions}>
+            <button type="submit" className={css.saveButton}>
+              Save
+            </button>
+            <button type="button" className={css.cancelButton}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 };
 
