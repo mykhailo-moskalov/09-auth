@@ -1,7 +1,7 @@
 "use client";
 
 import css from "./NoteForm.module.css";
-import { createNote } from "@/lib/api";
+import { createNote } from "@/lib/api/api";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
