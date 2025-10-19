@@ -12,7 +12,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 const EditProfile = () => {
   const [username, setUsername] = useState("");
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, setUser } = useAuthStore();
 
   useEffect(() => {
     getMe().then((user) => {
@@ -33,6 +33,8 @@ const EditProfile = () => {
 
     try {
       await updateMe({ username });
+      const updatedUser = await getMe();
+      setUser(updatedUser);
       router.push("/profile");
     } catch (error) {
       toast.error(
@@ -43,6 +45,8 @@ const EditProfile = () => {
       router.push("/profile");
     }
   };
+
+  const cancel = () => router.back();
 
   return (
     <main className={css.mainContent}>
@@ -77,7 +81,7 @@ const EditProfile = () => {
             <button type="submit" className={css.saveButton}>
               Save
             </button>
-            <button type="button" className={css.cancelButton}>
+            <button type="button" className={css.cancelButton} onClick={cancel}>
               Cancel
             </button>
           </div>
